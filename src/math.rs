@@ -1,16 +1,17 @@
 use std::fmt;
-use crate::vec_len;
 
-enum VectorType {
+#[derive(Debug)]
+pub enum VectorType {
     orthogonal,
-    parallel
+    parallel,
+    neitherOrthogonalOrParallel,
 }
 
 #[derive(Clone)]
 pub struct Vec3D {
     pub x: f64,
     pub y: f64,
-    pub z: f64
+    pub z: f64,
 }
 
 impl fmt::Display for Vec3D {
@@ -37,7 +38,7 @@ pub fn add_vec(a: &Vec3D, b: &Vec3D) -> Vec3D {
     Vec3D {
         x: a.x + b.x,
         y: a.y + b.y,
-        z: a.z + b.z
+        z: a.z + b.z,
     }
 }
 
@@ -59,7 +60,7 @@ pub fn sub_vec(a: &Vec3D, b: &Vec3D) -> Vec3D {
     Vec3D {
         x: a.x - b.x,
         y: a.y - b.y,
-        z: a.z - b.z
+        z: a.z - b.z,
     }
 }
 
@@ -116,7 +117,7 @@ pub fn vec_length(a: &Vec3D) -> f64 {
 ///
 /// ```
 pub fn normalize(a: &Vec3D) -> Vec3D {
-    Vec3D{
+    Vec3D {
         x: 1 as f64 / vec_length(&a) * a.x,
         y: 1 as f64 / vec_length(&a) * a.y,
         z: 1 as f64 / vec_length(&a) * a.z,
@@ -160,18 +161,17 @@ pub fn arccos(a: &Vec3D, b: &Vec3D) -> f64 {
     f64::acos(
         dot_product(
             &normalize(&a),
-            &normalize(&b)
+            &normalize(&b),
         )
     )
 }
 
 pub fn degress(a: f64) -> f64 {
-    println!("{}", std::f64::consts::PI);
     a * (180.0 / std::f64::consts::PI)
 }
 
 pub fn is_zero_vector(a: &Vec3D) -> bool {
-    return a.x == 0 && a.y == 0 && a.z == 0;
+    return f64::abs(vec_length(a)) < 10.0;
 }
 
 
@@ -188,9 +188,22 @@ pub fn is_zero_vector(a: &Vec3D) -> bool {
 pub fn check_vector_type(a: &Vec3D, b: &Vec3D) -> VectorType {
     let dot_product = dot_product(a, b);
 
-    if dot_product == 0 {
+    println!("Dot product {}", dot_product);
+
+    if dot_product == 0.0 {
         return VectorType::orthogonal;
     }
 
-    return VectorType::parallel;
+    println!("A is zero vector {}", is_zero_vector(&a));
+    println!("B is zero vector {}", is_zero_vector(&b));
+    println!("angle between A and B is {}", arccos(&a, &b));
+
+    if is_zero_vector(&a) ||
+        is_zero_vector(&b) ||
+        arccos(&a, &b) == 0.0 ||
+        arccos(&a, &b) == std::f64::consts::PI {
+        return VectorType::parallel;
+    }
+
+    return VectorType::neitherOrthogonalOrParallel;
 }
