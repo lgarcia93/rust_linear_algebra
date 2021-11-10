@@ -159,9 +159,12 @@ pub fn dot_product(a: &Vec3D, b: &Vec3D) -> f64 {
 /// ```
 pub fn arccos(a: &Vec3D, b: &Vec3D) -> f64 {
     f64::acos(
-        dot_product(
+        f64::clamp(dot_product(
             &normalize(&a),
             &normalize(&b),
+        ),
+                   -1.0,
+                   1.0,
         )
     )
 }
@@ -171,7 +174,7 @@ pub fn degress(a: f64) -> f64 {
 }
 
 pub fn is_zero_vector(a: &Vec3D) -> bool {
-    return f64::abs(vec_length(a)) < 10.0;
+    f64::abs(vec_length(a)) == 0.0
 }
 
 
@@ -186,11 +189,12 @@ pub fn is_zero_vector(a: &Vec3D) -> bool {
 /// returns: VectorType
 ///
 pub fn check_vector_type(a: &Vec3D, b: &Vec3D) -> VectorType {
-    let dot_product = dot_product(a, b);
+    let dot_product = f64::clamp(dot_product(a, b), -1.0, 1.0);
 
-    println!("Dot product {}", dot_product);
+    println!("the dot is {}", f64::abs((dot_product * 100f64).trunc() / 100.00));
 
-    if dot_product == 0.0 {
+    if f64::abs((dot_product * 100f64).trunc() / 100.00) == 0.0
+    {
         return VectorType::orthogonal;
     }
 
@@ -200,10 +204,27 @@ pub fn check_vector_type(a: &Vec3D, b: &Vec3D) -> VectorType {
 
     if is_zero_vector(&a) ||
         is_zero_vector(&b) ||
-        arccos(&a, &b) == 0.0 ||
+        arccos(&a, &b) < 0.1 ||
         arccos(&a, &b) == std::f64::consts::PI {
         return VectorType::parallel;
     }
 
     return VectorType::neitherOrthogonalOrParallel;
+}
+
+///Calculate the projection of vec_b onto vec_a
+pub fn projection(vec_a: &Vec3D, vec_b: &Vec3D) -> Vec3D {
+    let normalized_base = normalize(vec_a);
+
+    let dot_prod = dot_product(&normalized_base, vec_b);
+
+    Vec3D {
+        x: normalized_base.x * dot_prod,
+        y: normalized_base.y * dot_prod,
+        z: normalized_base.z * dot_prod,
+    }
+}
+
+pub fn get_perp_vector(vec: &Vec3D, parallel: &Vec3D) -> Vec3D {
+    sub_vec(&vec, &parallel)
 }

@@ -26,7 +26,11 @@ fn main() {
     // println!();
     // calc_angles();
 
-    check_vector_types();
+    //check_vector_types();
+
+    println!();
+
+    projecting_vectors();
 }
 
 fn add_vec() {
@@ -143,11 +147,70 @@ fn check_vector_types() {
     let vec_type = check_vector_type(&vec_a, &vec_b);
 
     println!("Vector {} and {} are {:?}", vec_a, vec_b, vec_type);
+    //
+    // let vec_a = Vec3D { x: 2.118, y: 4.827, z: 0.0 };
+    // let vec_b = Vec3D { x: 0.0, y: 0.0, z: 0.0 };
+    //
+    // let vec_type = check_vector_type(&vec_a, &vec_b);
+    //
+    // println!("Vector {} and {} are {:?}", vec_a, vec_b, vec_type);
+}
 
-    let vec_a = Vec3D { x: 2.118, y: 4.827, z: 0.0 };
-    let vec_b = Vec3D { x: 0.0, y: 0.0, z: 0.0 };
+fn projecting_vectors() {
+    let vec_v = Vec3D {
+        x: 3.039,
+        y: 1.879,
+        z: 0.0,
+    };
 
-    let vec_type = check_vector_type(&vec_a, &vec_b);
+    let vec_b = Vec3D {
+        x: 0.825,
+        y: 2.036,
+        z: 0.0,
+    };
 
-    println!("Vector {} and {} are {:?}", vec_a, vec_b, vec_type);
+    println!("Proj V {} onto B {} is {}", vec_v, vec_b, math::projection(&vec_b, &vec_v));
+
+    let vec_v = Vec3D {
+        x: -9.88,
+        y: -3.264,
+        z: -8.159,
+    };
+
+    let vec_b = Vec3D {
+        x: -2.155,
+        y: -9.353,
+        z: -9.473,
+    };
+
+    println!("Perp vector of V {} is {}",
+             vec_v,
+             math::get_perp_vector(
+                 &vec_v,
+                 &math::projection(
+                     &vec_b,
+                     &vec_v,
+                 ),
+             )
+    );
+
+    let vec_v = Vec3D {
+        x: 3.009,
+        y: -6.172,
+        z: 3.692,
+    };
+
+    let vec_b = Vec3D {
+        x: 6.404,
+        y: -9.144,
+        z: 2.759,
+    };
+
+    let proj_v_onto_b = math::projection(&vec_b, &vec_v);
+    println!("Projecting V {} onto B {} we can separate V in V Perp {} and V Parallel {}",
+             vec_v,
+             vec_b,
+             &proj_v_onto_b,
+             math::get_perp_vector(&vec_v, &proj_v_onto_b),
+    );
 }
